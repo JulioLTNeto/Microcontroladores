@@ -1,6 +1,7 @@
 Essa seção mostra as atividades em Assemby para o PIC12F672
 
  Lista do conteudo das atividades
+ 
   2 - Indentificador de triangulos, recebendo 3 valores, o sistema informa uma desposta de 1 a quatro,
       informando se o triângulo é Escaleno, Isóceles, Equilátero ou os lados não formam um triângulo
       
