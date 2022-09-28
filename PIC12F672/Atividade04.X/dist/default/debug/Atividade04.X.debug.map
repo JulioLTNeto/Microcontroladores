@@ -1,0 +1,66 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Wed Sep 28 17:56:49 2022
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                   .org_1       code   0x000004    program   0x0000ec
+.config_2007_BUILD/DEFAULT/DEBUG/ATIVIDADE04.       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000079      
+                            0x002007    0x002007      
+            122 out of 1158 program addresses used, program memory utilization is 10%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     IF_2   0x000011    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_3   0x000019    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_4   0x000021    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_5   0x000029    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_6   0x000031    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_7   0x000039    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_8   0x000041    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_9   0x000049    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                   INICIO   0x00005a    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+             INICIO_PULSO   0x000074    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     MAIN   0x00006b    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+      RESETA_ESTADO_SINAL   0x000071    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+              RESETA_TMR0   0x000051    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     SAIU   0x000054    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                  SAI_INT   0x000054    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+               SUBROTINA1   0x000059    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     IF_2   0x000011    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_3   0x000019    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_4   0x000021    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_5   0x000029    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_6   0x000031    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_7   0x000039    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_8   0x000041    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     IF_9   0x000049    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+              RESETA_TMR0   0x000051    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     SAIU   0x000054    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                  SAI_INT   0x000054    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+               SUBROTINA1   0x000059    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                   INICIO   0x00005a    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+                     MAIN   0x00006b    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+      RESETA_ESTADO_SINAL   0x000071    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+             INICIO_PULSO   0x000074    program     static C:\Users\julio\MPLABXProjects\Atividade04.X\Atividade04.ASM
+
+

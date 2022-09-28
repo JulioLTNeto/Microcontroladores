@@ -1,0 +1,11 @@
+Warning[202] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 140 : Argument out of range.  Least significant bits used.
+Warning[202] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 154 : Argument out of range.  Least significant bits used.
+Warning[202] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 168 : Argument out of range.  Least significant bits used.
+Warning[202] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 182 : Argument out of range.  Least significant bits used.
+Warning[202] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 196 : Argument out of range.  Least significant bits used.
+Warning[202] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 210 : Argument out of range.  Least significant bits used.
+Message[302] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 266 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 267 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 269 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 273 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[305] C:\USERS\JULIO\MPLABXPROJECTS\ATIVIDADE04.X\ATIVIDADE04.ASM 307 : Using default destination of 1 (file).

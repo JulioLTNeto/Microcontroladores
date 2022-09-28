@@ -1,0 +1,660 @@
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00002 ;*              MODIFICAÇÕES PARA USO COM 12F675                   *
+                      00003 ;*                FEITAS PELO PROF. MARDSON                        *
+                      00004 ;*                     SETEMBRO DE 2022                            *
+                      00005 ;*                 BASEADO NO EXEMPLO DO LIVRO                     *
+                      00006 ;*           Desbravando o PIC. David José de Souza                *
+                      00007 ;*-----------------------------------------------------------------*
+                      00008 ;*   MODELO PARA O PIC 12F675                                      *
+                      00009 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00010 
+                      00011 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00012 ;*                     ARQUIVOS DE DEFINIÇÕES                      *
+                      00013 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00014 #INCLUDE <p12f675.inc>  ;ARQUIVO PADRÃO MICROCHIP PARA 12F675
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 22 2017
+                      00005 ;  MPASM PIC12F675 processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00367         LIST
+                      00015 
+2007   3F84           00016         __CONFIG _BODEN_OFF & _CP_OFF & _PWRTE_ON & _WDT_OFF & _MCLRE_OFF & _INTRC_OSC_NOCLKOUT
+                      00017 
+                      00018 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00019 ;*                    PAGINAÇÃO DE MEMÓRIA                         *
+                      00020 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00021 ;DEFINIÇÃO DE COMANDOS DE USUÁRIO PARA ALTERAÇÃO DA PÁGINA DE MEMÓRIA
+                      00022 #DEFINE BANK0   BCF STATUS,RP0  ;SETA BANK 0 DE MEMÓRIA
+                      00023 #DEFINE BANK1   BSF STATUS,RP0  ;SETA BANK 1 DE MAMÓRIA
+                      00024 
+                      00025 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00026 ;*                         VARIÁVEIS                               *
+                      00027 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00028 ; DEFINIÇÃO DOS NOMES E ENDEREÇOS DE TODAS AS VARIÁVEIS UTILIZADAS 
+                      00029 ; PELO SISTEMA
+                      00030 
+                      00031         CBLOCK  0x20    ;ENDEREÇO INICIAL DA MEMÓRIA DE
+                      00032                                         ;USUÁRIO
+  00000020            00033                 W_TEMP          ;REGISTRADORES TEMPORÁRIOS PARA USO
+  00000021            00034                 STATUS_TEMP     ;JUNTO ÀS INTERRUPÇÕES
+                      00035 
+                      00036                 ;COLOQUE AQUI SUAS NOVAS VARIÁVEIS
+                      00037                 ;NÃO ESQUEÇA COMENTÁRIOS ESCLARECEDORES
+                      00038                 
+  00000022            00039                 CONTADOR        ;0x22
+  00000023            00040                 ESTADO_SINAL    ;0x23
+                      00041 
+                      00042         ENDC                    ;FIM DO BLOCO DE DEFINIÇÃO DE VARIÁVEIS
+                      00043 
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00044 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00045 ;*                        FLAGS INTERNOS                           *
+                      00046 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00047 ; DEFINIÇÃO DE TODOS OS FLAGS UTILIZADOS PELO SISTEMA
+                      00048 
+                      00049 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00050 ;*                         CONSTANTES                              *
+                      00051 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00052 ; DEFINIÇÃO DE TODAS AS CONSTANTES UTILIZADAS PELO SISTEMA
+                      00053 
+                      00054 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00055 ;*                           ENTRADAS                              *
+                      00056 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00057 ; DEFINIÇÃO DE TODOS OS PINOS QUE SERÃO UTILIZADOS COMO ENTRADA
+                      00058 ; RECOMENDAMOS TAMBÉM COMENTAR O SIGNIFICADO DE SEUS ESTADOS (0 E 1)
+                      00059 
+                      00060 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00061 ;*                           SAÍDAS                                *
+                      00062 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00063 ; DEFINIÇÃO DE TODOS OS PINOS QUE SERÃO UTILIZADOS COMO SAÍDA
+                      00064 ; RECOMENDAMOS TAMBÉM COMENTAR O SIGNIFICADO DE SEUS ESTADOS (0 E 1)
+                      00065 
+                      00066 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00067 ;*                       VETOR DE RESET                            *
+                      00068 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00069 
+                      00070         ORG     0x00                    ;ENDEREÇO INICIAL DE PROCESSAMENTO
+0000   2???           00071         GOTO    INICIO
+                      00072         
+                      00073 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00074 ;*                    INÍCIO DA INTERRUPÇÃO                        *
+                      00075 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00076 ; ENDEREÇO DE DESVIO DAS INTERRUPÇÕES. A PRIMEIRA TAREFA É SALVAR OS
+                      00077 ; VALORES DE "W" E "STATUS" PARA RECUPERAÇÃO FUTURA
+                      00078 
+                      00079         ORG     0x04                    ;ENDEREÇO INICIAL DA INTERRUPÇÃO
+0004   00A0           00080         MOVWF   W_TEMP          ;COPIA W PARA W_TEMP
+0005   0E03           00081         SWAPF   STATUS,W
+0006   00A1           00082         MOVWF   STATUS_TEMP     ;COPIA STATUS PARA STATUS_TEMP
+                      00083 
+                      00084 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00085 ;*                    ROTINA DE INTERRUPÇÃO                        *
+                      00086 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+0007   1D0B           00087         BTFSS   INTCON,T0IF     ;FAZ A VERIFICAÇÃO SE A INTERRUPÇÃO FOI FEITA PELO TMR0
+0008   2???           00088         GOTO    SAIU            ;VAI PARA SAIU
+                      00089         
+                      00090 ;INICIO DOS IFS PARA A SAIDA DO GPIO, CADA BLOCO DE INSTRUÇÕES É RESPONSÁVEL POR VERIFICAR O VALOR DA VA
+                            RIÁVEL CONTADOR E GERAR UMA SAIDA DO GPIO PERTINENTE
+                      00091         ;ESSE BLOCO FAZ A VERIFICAÇÃO SE CONTADOR É IGUAL A 1
+0009   3001           00092         MOVLW   .1
+000A   0222           00093         SUBWF   CONTADOR,W  ;SUBTRAI 1 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00094         
+000B   1D03           00095         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                            HA
+000C   2???           00096         GOTO    IF_2        ;PULA PARA O IF_2
+                      00097         
+000D   3001           00098         MOVLW   .00000001   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0001 - PARA O BCP: 1
+000E   0085           00099         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00100         
+000F   3000           00101         MOVLW   .0          
+0010   00A2           00102         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00103         
+                      00104 ;VERIFICA SE O CONTADOR É IGUAL A 2
+0011                  00105 IF_2
+0011   3002           00106         MOVLW   .2          
+0012   0222           00107         SUBWF   CONTADOR,W  ;SUBTRAI 2 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00108         
+0013   1D03           00109         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+0014   2???           00110         GOTO    IF_3        ;PULA PARA O IF_3
+                      00111         
+0015   300A           00112         MOVLW   .00000010   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0010 - PARA O BCP: 2
+0016   0085           00113         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00114         
+0017   3000           00115         MOVLW   .0
+0018   00A2           00116         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00117 
+                      00118 ;VERIFICA SE O CONTADOR É 3
+0019                  00119 IF_3
+0019   3003           00120         MOVLW   .3
+001A   0222           00121         SUBWF   CONTADOR,W  ;SUBTRAI 3 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00122         
+001B   1D03           00123         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+001C   2???           00124         GOTO    IF_4        ;PULA PARA O IF_4
+                      00125         
+001D   300B           00126         MOVLW   .00000011   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0011 - PARA O BCP: 3
+001E   0085           00127         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00128         
+001F   3000           00129         MOVLW   .0
+0020   00A2           00130         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00131 
+                      00132 ;VERIFICA SE O CONTADOR É 4
+0021                  00133 IF_4
+0021   3004           00134         MOVLW   .4
+0022   0222           00135         SUBWF   CONTADOR,W  ;SUBTRAI 4 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00136         
+0023   1D03           00137         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+0024   2???           00138         GOTO    IF_5        ;PULA PARA O IF_5
+                      00139         
+Warning[202]: Argument out of range.  Least significant bits used.
+0025   3010           00140         MOVLW   .00010000   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0100 - PARA O BCP: 4
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0026   0085           00141         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00142         
+0027   3000           00143         MOVLW   .0
+0028   00A2           00144         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00145 
+                      00146 ;VERIFICA SE O CONTADOR É 5
+0029                  00147 IF_5
+0029   3005           00148         MOVLW   .5
+002A   0222           00149         SUBWF   CONTADOR,W  ;SUBTRAI 5 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00150         
+002B   1D03           00151         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+002C   2???           00152         GOTO    IF_6        ;PULA PARA O IF_6
+                      00153         
+Warning[202]: Argument out of range.  Least significant bits used.
+002D   3011           00154         MOVLW   .00010001   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0101 - PARA O BCP: 5
+002E   0085           00155         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00156         
+002F   3000           00157         MOVLW   .0
+0030   00A2           00158         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00159         
+                      00160 ;VERIFICA SE O CONTADOR É 6
+0031                  00161 IF_6
+0031   3006           00162         MOVLW   .6
+0032   0222           00163         SUBWF   CONTADOR,W  ;SUBTRAI 6 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00164         
+0033   1D03           00165         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+0034   2???           00166         GOTO    IF_7        ;PULA PARA O IF_7
+                      00167         
+Warning[202]: Argument out of range.  Least significant bits used.
+0035   301A           00168         MOVLW   .00010010   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0110 - PARA O BCP: 6
+0036   0085           00169         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00170         
+0037   3000           00171         MOVLW   .0
+0038   00A2           00172         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00173 
+                      00174 ;VERIFICA SE O CONTADOR É 7
+0039                  00175 IF_7
+0039   3007           00176         MOVLW   .7
+003A   0222           00177         SUBWF   CONTADOR,W  ;SUBTRAI 7 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00178         
+003B   1D03           00179         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+003C   2???           00180         GOTO    IF_8        ;PULA PARA O IF_8
+                      00181         
+Warning[202]: Argument out of range.  Least significant bits used.
+003D   301B           00182         MOVLW   .00010011   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 0111 - PARA O BCP: 7
+003E   0085           00183         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00184         
+003F   3000           00185         MOVLW   .0
+0040   00A2           00186         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00187 
+                      00188 ;VERIFICA SE O CONTADOR É 8
+0041                  00189 IF_8
+0041   3008           00190         MOVLW   .8
+0042   0222           00191         SUBWF   CONTADOR,W  ;SUBTRAI 8 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00192         
+0043   1D03           00193         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+0044   2???           00194         GOTO    IF_9        ;PULA PARA O IF_9
+                      00195         
+Warning[202]: Argument out of range.  Least significant bits used.
+0045   30A0           00196         MOVLW   .00100000   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 1000 - PARA O BCP: 8
+0046   0085           00197         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00198         
+0047   3000           00199         MOVLW   .0
+0048   00A2           00200         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00201 
+                      00202 ;VERIFICA SE O CONTADOR É 9
+0049                  00203 IF_9
+0049   3009           00204         MOVLW   .9
+004A   0222           00205         SUBWF   CONTADOR,W  ;SUBTRAI 9 DE CONTADOR, PARA VERIFICAR SE O RESULTADO É 0
+                      00206         
+004B   1D03           00207         BTFSS   STATUS,Z    ;FAZ A VERIFICAÇÃO, SE A SUBTRAÇÃO NÃO DEU 0, ENTÃO O SISTEMA NÃO PULA A LIN
+                            HA
+004C   2???           00208         GOTO    RESETA_TMR0 ;PULA PARA O RESETA_TMR0
+                      00209         
+Warning[202]: Argument out of range.  Least significant bits used.
+004D   3011           00210         MOVLW   .00010001   ;CONJUNTO DE BITS PARA SALVAR NO GPIO, 1001 - PARA O BCP: 9
+004E   0085           00211         MOVWF   GPIO        ;SALVANDO AS SAIDAS DAS PORTAS NO GPIO, A PORTA 3 E 2 SÃO ENTRADAS, ENTÃO EL
+                            AS NÃO IMPORTAM
+                      00212         
+004F   3000           00213         MOVLW   .0
+0050   00A2           00214         MOVWF   CONTADOR    ;RESETA O CONTADOR
+                      00215         
+                      00216         
+0051                  00217 RESETA_TMR0                 ;BLOCO RESPONSAVEL POR RESETAR O TMR0
+0051   30B2           00218         MOVLW   .178
+0052   0081           00219         MOVWF   TMR0
+0053   110B           00220         BCF     INTCON,T0IF;RESETA A FLAG DA INTERRUPÇÃO
+                      00221         
+0054                  00222 SAIU
+                      00223 ;NAO_RESETA_TIMER0
+                      00224 ;       BTFSS   GPIO,GP4
+                      00225 ;       GOTO    LIGA
+                      00226 ;       BCF     GPIO,GP4
+                      00227 ;       GOTO    LIMPA_FLAG
+                      00228 ;LIGA   BSF     GPIO,GP4
+                      00229 ;LIMPA_FLAG
+                      00230 ;       BCF     INTCON,GPIF ;VEJA NO DATA SHEET:
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00231                             ;É NECESSÁRIO QUE O "CLEAR" DESTE FLAG SEJA
+                      00232                             ;COLOCADO APÓS UM "read or write of GPIO"
+                      00233         
+                      00234 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00235 ;*                 ROTINA DE SAÍDA DA INTERRUPÇÃO                  *
+                      00236 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00237 ; OS VALORES DE "W" E "STATUS" DEVEM SER RECUPERADOS ANTES DE 
+                      00238 ; RETORNAR DA INTERRUPÇÃO
+                      00239 
+0054                  00240 SAI_INT
+0054   0E21           00241         SWAPF   STATUS_TEMP,W
+0055   0083           00242         MOVWF   STATUS          ;MOVE STATUS_TEMP PARA STATUS
+0056   0EA0           00243         SWAPF   W_TEMP,F
+0057   0E20           00244         SWAPF   W_TEMP,W        ;MOVE W_TEMP PARA W
+0058   0009           00245         RETFIE
+                      00246 
+                      00247 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00248 ;*                       ROTINAS E SUBROTINAS                      *
+                      00249 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00250 ; CADA ROTINA OU SUBROTINA DEVE POSSUIR A DESCRIÇÃO DE FUNCIONAMENTO
+                      00251 ; E UM NOME COERENTE ÀS SUAS FUNÇÕES.
+                      00252 
+0059                  00253 SUBROTINA1
+                      00254 
+                      00255         ;CORPO DA ROTINA
+                      00256 
+0059   0008           00257         RETURN
+                      00258 
+                      00259 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00260 ;*                     INICIO DO PROGRAMA                          *
+                      00261 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00262         
+005A                  00263 INICIO
+005A   1683           00264         BANK1                           ;ALTERA PARA O BANCO 1
+005B   300C           00265         MOVLW   B'00001100' ;CONFIGURA TODAS AS PORTAS DO GPIO (PINOS)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+005C   0085           00266         MOVWF   TRISIO          ;COMO SAÍDAS
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+005D   019F           00267         CLRF    ANSEL           ;DEFINE PORTAS COMO Digital I/O
+005E   3007           00268         MOVLW   B'00000111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+005F   0081           00269         MOVWF   OPTION_REG      ;DEFINE OPÇÕES DE OPERAÇÃO
+0060   30A8           00270         MOVLW   B'10101000'     ;INTERRUPÇÃO GERAL E POR MUDANÇA DE PORTA HABILITADA
+0061   008B           00271         MOVWF   INTCON          ;DEFINE OPÇÕES DE INTERRUPÇÕES
+0062   3008           00272         MOVLW   B'00001000'     ;INTERRUPÇÃO POR GP3 HABILITADA
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0063   0096           00273         MOVWF   IOC
+0064   1283           00274         BANK0                           ;RETORNA PARA O BANCO
+0065   3007           00275         MOVLW   B'00000111'
+0066   0099           00276         MOVWF   CMCON           ;DEFINE O MODO DE OPERAÇÃO DO COMPARADOR ANALÓGICO
+                      00277 
+                      00278 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00279 ;*                     INICIALIZAÇÃO DAS VARIÁVEIS                 *
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00280 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+0067   3000           00281         MOVLW   .0      ;INICIA O CONTADOR COMO 0
+0068   00A2           00282         MOVWF   CONTADOR;COLOCA O VALOR 0 NA VARIAVEL CONTADOR
+                      00283         
+0069   30B2           00284         MOVLW   .178    ;INICIA O TIMER EM 176, UM VALOR QUE DA APROXIMADAMENTE 20MS
+006A   0081           00285         MOVWF   TMR0    ;CONFIGURA O TMR0
+                      00286         
+                      00287 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00288 ;*                     ROTINA PRINCIPAL                            *
+                      00289 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+006B                  00290 MAIN
+006B   1D05           00291         BTFSS   GPIO,GP2    ;VERIFICA SE ENTROU EM UM PULSO
+006C   2???           00292         GOTO    RESETA_ESTADO_SINAL ;CHAMA O RESETA_ESTADO_SINAL
+                      00293         
+                      00294         ;VERIFICA O ESTADO_SINAL, PARA O SISTEMA NÃO FICAR INCREMENTANO A VARIAVEL CONTADOR QUANDO ESTIV
+                            ER NO MESMO PULSO
+006D   0323           00295         DECF    ESTADO_SINAL,W  ;DECREMENTA O VALOR DE ESTADO_SINAL PARA VER SE A VARIAVEL É IGUAL A ZER
+                            O, SALVA O VALOR NO WORK
+006E   1D03           00296         BTFSS   STATUS,Z        ;FAZ A VERIFICAÇÃO DO STATUS, VENDO SE ESTADO_SINAL MENOS 1 É IGUAL A ZE
+                            RO
+                      00297                                 ;NÃO PULA SE O RESULTADO FOR 0, JÁ QUE ESTADO_SINAL É 1
+006F   2???           00298         GOTO    INICIO_PULSO    ;VAI PARA O INICIO_PULSO
+0070   2???           00299         GOTO    MAIN            ;VAI PARA MAIN
+                      00300         
+0071                  00301 RESETA_ESTADO_SINAL             ;TRECHO RESPONSÁVEL POR SETAR COMO 0 O VALOR DA VARIAVEL ESTADO_SINAL
+0071   3000           00302         MOVLW   .0              ;ESSE TRECHO É RESPONSAVEL POR NÃO DEIXAR O PROGRAMA SEMPRE ENTRANDO NO 
+                            INICIO_PULSO VARIAS VEZES NO MESMO PULSO
+0072   00A3           00303         MOVWF   ESTADO_SINAL    
+0073   2???           00304         GOTO    MAIN
+                      00305         
+0074                  00306 INICIO_PULSO        ;ESSE TRECHO É RESPONSAVEL POR CONTABILIZAR A QUANTIDADE DE PULSOS OCORREU, PARA SAI
+                            R NO GPIO
+Message[305]: Using default destination of 1 (file).
+0074   0AA2           00307         INCF    CONTADOR    ;SOMA O VALOR DO CONTADOR +1
+0075   3001           00308         MOVLW   .1
+0076   00A3           00309         MOVWF   ESTADO_SINAL    ;ALTERA O ESTADO_SINAL PARA QUE O SISTEMA NÃO ENTRE NESSA SEÇÃO NESSE PU
+                            LSO
+                      00310         
+0077   30B2           00311         MOVLW   .178    ;RESETA A CONTAGEM DO TMR0 PARA ESPERAR MAIS 20MS ANTES DA INTERRUPÇÃO
+0078   0081           00312         MOVWF   TMR0
+                      00313         
+0079   2???           00314         GOTO    MAIN    ;VOLTA PARA A MAIN
+                      00315 
+                      00316 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00317 ;*                       FIM DO PROGRAMA                           *
+                      00318 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00319 
+3F84                  00320         END
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ADCON0                            0000001F
+ADCS0                             00000004
+ADCS1                             00000005
+ADCS2                             00000006
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+ANS0                              00000000
+ANS1                              00000001
+ANS2                              00000002
+ANS3                              00000003
+ANSEL                             0000009F
+BANK0                             BCF STATUS,RP0
+BANK1                             BSF STATUS,RP0
+C                                 00000000
+CAL0                              00000002
+CAL1                              00000003
+CAL2                              00000004
+CAL3                              00000005
+CAL4                              00000006
+CAL5                              00000007
+CHS0                              00000002
+CHS1                              00000003
+CINV                              00000004
+CIS                               00000003
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             00000019
+CMIE                              00000003
+CMIF                              00000003
+CONTADOR                          00000022
+COUT                              00000006
+DC                                00000001
+EEADR                             0000009B
+EECON1                            0000009C
+EECON2                            0000009D
+EEDAT                             0000009A
+EEDATA                            0000009A
+EEIE                              00000007
+EEIF                              00000007
+ESTADO_SINAL                      00000023
+F                                 00000001
+FSR                               00000004
+GIE                               00000007
+GO                                00000001
+GO_DONE                           00000001
+GO_NOT_DONE                       00000001
+GP0                               00000000
+GP1                               00000001
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+GP2                               00000002
+GP3                               00000003
+GP4                               00000004
+GP5                               00000005
+GPIE                              00000003
+GPIF                              00000000
+GPIO                              00000005
+GPIO0                             00000000
+GPIO1                             00000001
+GPIO2                             00000002
+GPIO3                             00000003
+GPIO4                             00000004
+GPIO5                             00000005
+IF_2                              00000011
+IF_3                              00000019
+IF_4                              00000021
+IF_5                              00000029
+IF_6                              00000031
+IF_7                              00000039
+IF_8                              00000041
+IF_9                              00000049
+INDF                              00000000
+INICIO                            0000005A
+INICIO_PULSO                      00000074
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IOC                               00000096
+IOC0                              00000000
+IOC1                              00000001
+IOC2                              00000002
+IOC3                              00000003
+IOC4                              00000004
+IOC5                              00000005
+IOCB                              00000096
+IOCB0                             00000000
+IOCB1                             00000001
+IOCB2                             00000002
+IOCB3                             00000003
+IOCB4                             00000004
+IOCB5                             00000005
+IRP                               00000007
+MAIN                              0000006B
+NOT_BOD                           00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000001
+NOT_GPPU                          00000007
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+OPTION_REG                        00000081
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+OSCCAL                            00000090
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PIE1                              0000008C
+PIR1                              0000000C
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RD                                00000000
+RESETA_ESTADO_SINAL               00000071
+RESETA_TMR0                       00000051
+RP0                               00000005
+RP1                               00000006
+SAIU                              00000054
+SAI_INT                           00000054
+STATUS                            00000003
+STATUS_TEMP                       00000021
+SUBROTINA1                        00000059
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1IE                              00000000
+T1IF                              00000000
+T1OSCEN                           00000003
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1GE                            00000006
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TRISIO                            00000085
+TRISIO0                           00000000
+TRISIO1                           00000001
+TRISIO2                           00000002
+TRISIO3                           00000003
+TRISIO4                           00000004
+TRISIO5                           00000005
+VCFG                              00000006
+VR0                               00000000
+VR1                               00000001
+VR2                               00000002
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE 11
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+VR3                               00000003
+VRCON                             00000099
+VREN                              00000007
+VRR                               00000005
+W                                 00000000
+WPU                               00000095
+WPU0                              00000000
+WPU1                              00000001
+WPU2                              00000002
+WPU4                              00000004
+WPU5                              00000005
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            00000020
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_OFF                           00003FFF
+_CP_ON                            00003F7F
+_DEVID1                           00002006
+_EC_OSC                           00003FFB
+_EXTRC_OSC_CLKOUT                 00003FFF
+_EXTRC_OSC_NOCLKOUT               00003FFE
+_FOSC_EC                          00003FFB
+_FOSC_EXTRCCLK                    00003FFF
+_FOSC_EXTRCIO                     00003FFE
+_FOSC_HS                          00003FFA
+_FOSC_INTRCCLK                    00003FFD
+_FOSC_INTRCIO                     00003FFC
+_FOSC_LP                          00003FF8
+_FOSC_XT                          00003FF9
+_HS_OSC                           00003FFA
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_INTRC_OSC_CLKOUT                 00003FFD
+_INTRC_OSC_NOCLKOUT               00003FFC
+_LP_OSC                           00003FF8
+_MCLRE_OFF                        00003FDF
+_MCLRE_ON                         00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FEF
+_WDTE_OFF                         00003FF7
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FF7
+_WDT_ON                           00003FFF
+MPASM 5.77                   ATIVIDADE04.ASM   9-28-2022  17:56:48         PAGE 12
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_XT_OSC                           00003FF9
+__12F675                          00000001
+__DEBUG                           
+__MPLAB_DEBUGGER_SIMULATOR        1
+
+Errors   :     0
+Warnings :     6 reported,     0 suppressed
+Messages :     5 reported,     0 suppressed
+
+
